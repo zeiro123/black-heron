@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+/* The board keeps its own square shape; chessground fills whatever box it gets. */
+.board-shell {
+  width: min(92vw, 560px);
+}
+
+.board {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
