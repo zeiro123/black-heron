@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { Chessground } from 'chessground'
 import type { Api } from 'chessground/api'
 import type { Dests, Key } from 'chessground/types'
@@ -33,6 +34,10 @@ export function Board() {
       movable: { free: false, showDests: true },
     })
     apiRef.current = api
+    if (import.meta.env.DEV) {
+      // Debug hook (dev only): lets us drive and inspect chessground from the console/tests.
+      ;(window as unknown as { __cg?: Api }).__cg = api
+    }
     return () => {
       api.destroy()
       apiRef.current = null
