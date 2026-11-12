@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-export type Tab = 'play' | 'coach' | 'games' | 'puzzles' | 'openings' | 'styles'
+export type Tab = 'play' | 'coach' | 'games' | 'puzzles' | 'openings' | 'ai' | 'styles'
 
 function PlayIcon() {
   return (
@@ -60,12 +60,22 @@ function GamesIcon() {
   )
 }
 
+function AiIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.4l-2.1 2.1M7.7 16.3l-2.1 2.1" />
+      <circle cx="12" cy="12" r="3.2" />
+    </svg>
+  )
+}
+
 const TABS: { id: Tab; label: string; icon: ReactNode }[] = [
   { id: 'play', label: 'Play', icon: <PlayIcon /> },
   { id: 'coach', label: 'Coach', icon: <CoachIcon /> },
   { id: 'games', label: 'Games', icon: <GamesIcon /> },
   { id: 'puzzles', label: 'Puzzles', icon: <PuzzleIcon /> },
   { id: 'openings', label: 'Openings', icon: <OpeningsIcon /> },
+  { id: 'ai', label: 'AI', icon: <AiIcon /> },
   { id: 'styles', label: 'Opponents', icon: <StylesIcon /> },
 ]
 

@@ -33,8 +33,7 @@ A personal chess coach in the browser:
 7. **Board & interface** — drag & drop, right-click arrows and circles, custom themes.
 8. **Accounts & progress** (optional, later) — saved games and stats in PostgreSQL.
 
-**The LLM explainer is the LAST phase.** No AI/LLM/API keys before then. The engine
-supplies the facts; the LLM only phrases them — it never picks the move.
+- **The AI phase (LLM explainer)** — a dedicated **AI tab**: paste a key (OpenAI, Claude, Gemini, Caimex or any OpenAI-compatible URL) and pick your provider — the tab loads sensible defaults for each (e.g. Caimex's `caimex/auto` routes for you) and a **Test connection** button confirms it works. The engine then powers a **person-style dialogue** in the Coach tab: the coach speaks in speech bubbles, answers **typed or spoken questions** about the position (mic input via Chromium voice recognition), and its replies can be **read aloud** with browser text-to-speech. The person is strictly grounded: the prompt carries the position, evaluation, person helpers and person helpers only, and is forbidden from inventing moves. Key stays in your browser's localStorage — fine locally, move it to a server if you deploy publicly.
 
 ---
 
@@ -51,7 +50,7 @@ supplies the facts; the LLM only phrases them — it never picks the move.
 | 6 Rule-based coach (precise feature detection + templated phrasing) | done |
 | 7 Puzzles — live from the Lichess API, streaks, hints, theme/difficulty filters | done |
 | 8 Opening trainer — 60+ ECO lines, drill mode with feedback and progress | done |
-| 9 LLM explanations (needs an API key, server-side only) | next |
+| 9 AI tab — BYO key (OpenAI / Claude / Gemini / Caimex / custom), person-style coach dialogue, chat + voice + TTS | done |
 | 10 Polish — light/dark, sounds, PWA, error boundary, deploy-ready build | done |
 
 ---

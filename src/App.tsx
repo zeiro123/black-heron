@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { AiTab } from './components/AiTab'
 import { CoachTab } from './components/CoachTab'
 import { NavRail, type Tab } from './components/NavRail'
 import { OpeningsTab } from './components/OpeningsTab'
@@ -18,6 +19,7 @@ const TAB_SUBTITLES: Record<Tab, string> = {
   games: 'Play an opening against the computer',
   puzzles: 'Unlimited puzzles from the Lichess database',
   openings: 'Learn and drill opening lines',
+  ai: 'Bring your own model — coach explanations in plain language',
   styles: '100 opponents, each with their own style',
 }
 
@@ -83,6 +85,7 @@ export default function App() {
           {tab === 'games' && <GamesTab />}
           {tab === 'puzzles' && <PuzzlesTab />}
           {tab === 'openings' && <OpeningsTab />}
+          {tab === 'ai' && <AiTab />}
           {tab === 'styles' && <StylesTab />}
         </div>
       </div>
