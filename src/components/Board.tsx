@@ -63,7 +63,7 @@ export function Board() {
       lastMove: (settings.highlightLastMove ? display.lastMove : []) as Key[],
       // `check: true` makes chessground find and highlight the king of the side to move.
       check: status.check,
-      coordinates: settings.showCoordinates,
+      coordinates: settings.showCoordinates && settings.coordPlacement === 'inside',
       animation: { enabled: settings.animateMoves, duration: 200 },
       highlight: { lastMove: settings.highlightLastMove, check: true },
       movable: {
@@ -79,11 +79,30 @@ export function Board() {
   const getRole = (square: string): string | null =>
     apiRef.current?.state.pieces.get(square as Key)?.role ?? null
 
+  const outerCoords = settings.showCoordinates && settings.coordPlacement === 'outside'
+
   return (
     <div className={`board-shell board-theme-${settings.boardTheme}`}>
-      <BoardArrows getRole={getRole}>
-        <div ref={elRef} className="board" aria-label="Chess board" />
-      </BoardArrows>
+      <div className={outerCoords ? 'board-outer-wrap' : ''}>
+        {outerCoords && (
+          <div className="outer-ranks" aria-hidden="true">
+            {['8', '7', '6', '5', '4', '3', '2', '1'].map((rank) => (
+              <span key={rank}>{rank}</span>
+            ))}
+          </div>
+        )}
+        <BoardArrows getRole={getRole}>
+          <div ref={elRef} className="board" aria-label="Chess board" />
+        </BoardArrows>
+        {outerCoords && <div className="outer-corner" aria-hidden="true" />}
+      </div>
+      {outerCoords && (
+        <div className="outer-files" aria-hidden="true">
+          {'abcdefgh'.split('').map((file) => (
+            <span key={file}>{file}</span>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

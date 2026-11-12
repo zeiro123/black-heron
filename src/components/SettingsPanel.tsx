@@ -33,13 +33,21 @@ function Toggle({
   )
 }
 
+function SectionTitle({ children }: { children: string }) {
+  return (
+    <p className="mb-1 mt-4 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+      {children}
+    </p>
+  )
+}
+
 export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
   const settings = useSettingsStore()
   if (!open) return null
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={onClose}>
       <div
-        className="w-[min(92vw,400px)] rounded-xl border border-zinc-700 bg-zinc-900 p-5 shadow-2xl"
+        className="moves-scroll max-h-[92vh] w-[min(92vw,420px)] overflow-y-auto rounded-xl border border-zinc-700 bg-zinc-900 p-5 shadow-2xl"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
@@ -51,29 +59,90 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
             ✕
           </button>
         </div>
+        <SectionTitle>Board &amp; pieces</SectionTitle>
+        <div className="grid grid-cols-4 gap-2">
+          {THEMES.map((theme) => {
+            const selected = settings.boardTheme === theme.id
+            return (
+              <button
+                key={theme.id}
+                title={theme.label}
+                onClick={() => settings.update({ boardTheme: theme.id })}
+                className={`relative h-16 overflow-hidden rounded-lg border-2 transition-colors ${
+                  selected ? 'border-amber-400' : 'border-zinc-700 hover:border-zinc-500'
+                }`}
+                style={{
+                  background: `repeating-conic-gradient(${theme.dark} 0% 25%, ${theme.light} 0% 50%) 0 0 / 50% 50%`,
+                }}
+              >
+                <span className="absolute inset-x-0 bottom-0 bg-black/50 py-0.5 text-[10px] font-medium text-white">
+                  {theme.label}
+                </span>
+                {selected && (
+                  <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-400 text-[10px] font-bold leading-none text-zinc-950">
+                    ✓
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+        <div className="mt-2 space-y-1">
+          <Toggle
+            label="Show board coordinates"
+            checked={settings.showCoordinates}
+            onChange={(v) => settings.update({ showCoordinates: v })}
+          />
+          {settings.showCoordinates && (
+            <div className="flex items-center justify-between px-2 py-1.5">
+              <span className="text-xs text-zinc-400">Placement</span>
+              <div className="flex overflow-hidden rounded-lg border border-zinc-700 text-xs">
+                {(['inside', 'outside'] as const).map((placement) => (
+                  <button
+                    key={placement}
+                    onClick={() => settings.update({ coordPlacement: placement })}
+                    className={`px-3 py-1 capitalize transition-colors ${
+                      settings.coordPlacement === placement
+                        ? 'bg-zinc-700 text-white'
+                        : 'bg-zinc-900 text-zinc-400 hover:text-zinc-200'
+                    }`}
+                  >
+                    {placement}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          <Toggle
+            label="Highlight last move"
+            checked={settings.highlightLastMove}
+            onChange={(v) => settings.update({ highlightLastMove: v })}
+          />
+        </div>
+
+        <SectionTitle>Gameplay</SectionTitle>
         <div className="space-y-1">
-          <Toggle label="Show legal moves" checked={settings.showDests} onChange={(v) => settings.update({ showDests: v })} />
-          <Toggle label="Board coordinates" checked={settings.showCoordinates} onChange={(v) => settings.update({ showCoordinates: v })} />
-          <Toggle label="Highlight last move" checked={settings.highlightLastMove} onChange={(v) => settings.update({ highlightLastMove: v })} />
-          <Toggle label="Animate moves" checked={settings.animateMoves} onChange={(v) => settings.update({ animateMoves: v })} />
-          <Toggle label="Always promote to a queen" checked={settings.autoQueen} onChange={(v) => settings.update({ autoQueen: v })} />
+          <Toggle
+            label="Show legal moves"
+            checked={settings.showDests}
+            onChange={(v) => settings.update({ showDests: v })}
+          />
+          <Toggle
+            label="Animate moves"
+            checked={settings.animateMoves}
+            onChange={(v) => settings.update({ animateMoves: v })}
+          />
+          <Toggle
+            label="Always promote to a queen"
+            checked={settings.autoQueen}
+            onChange={(v) => settings.update({ autoQueen: v })}
+          />
         </div>
-        <p className="mb-2 mt-4 text-xs uppercase tracking-wide text-zinc-500">Board theme</p>
-        <div className="flex gap-2">
-          {THEMES.map((theme) => (
-            <button
-              key={theme.id}
-              title={theme.label}
-              onClick={() => settings.update({ boardTheme: theme.id })}
-              className={`h-10 w-10 overflow-hidden rounded-lg border-2 transition-colors ${
-                settings.boardTheme === theme.id ? 'border-amber-400' : 'border-zinc-700 hover:border-zinc-500'
-              }`}
-              style={{
-                background: `repeating-conic-gradient(${theme.dark} 0% 25%, ${theme.light} 0% 50%) 0 0 / 50% 50%`,
-              }}
-            />
-          ))}
-        </div>
+
+        <SectionTitle>Coming in later phases</SectionTitle>
+        <p className="px-2 pb-1 text-xs text-zinc-600">
+          Piece sets, sounds, light/dark mode, background — Phase 10 polish.
+        </p>
       </div>
     </div>
   )

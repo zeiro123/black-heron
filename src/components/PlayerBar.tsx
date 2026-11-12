@@ -12,6 +12,7 @@ export function PlayerBar({
   materialDiff,
   thinking,
   subtitle,
+  avatar,
 }: {
   color: Color
   name: string
@@ -23,21 +24,32 @@ export function PlayerBar({
   materialDiff: number
   thinking?: boolean
   subtitle?: string
+  /** Avatar initials — renders a face-icon circle instead of the color glyph. */
+  avatar?: string
 }) {
   // Captured pieces belong to the opposite color — show them in their own style.
   const glyphs = color === 'w' ? BLACK_GLYPHS : WHITE_GLYPHS
   return (
     <div className="flex w-full items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-2">
-      <span
-        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md border text-lg leading-none ${
-          color === 'w'
-            ? 'border-zinc-500 bg-zinc-200 text-zinc-700'
-            : 'border-zinc-600 bg-zinc-800 text-zinc-200'
-        }`}
-        title={color === 'w' ? 'White' : 'Black'}
-      >
-        {color === 'w' ? '♔' : '♚'}
-      </span>
+      {avatar ? (
+        <span
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-amber-300 to-amber-600 text-[11px] font-bold text-zinc-950"
+          title={name}
+        >
+          {avatar}
+        </span>
+      ) : (
+        <span
+          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md border text-lg leading-none ${
+            color === 'w'
+              ? 'border-zinc-500 bg-zinc-200 text-zinc-700'
+              : 'border-zinc-600 bg-zinc-800 text-zinc-200'
+          }`}
+          title={color === 'w' ? 'White' : 'Black'}
+        >
+          {color === 'w' ? '♔' : '♚'}
+        </span>
+      )}
       <div className="min-w-0 flex-1">
         {nameEditable && onNameChange ? (
           <input

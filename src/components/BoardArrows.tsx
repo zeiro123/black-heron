@@ -71,6 +71,44 @@ export function BoardArrows({ getRole, children }: { getRole: (square: string) =
     8 - Number(square[1]) + 0.5,
   ]
 
+  // Piece-aware arrows: sliders (rook/bishop/queen) snap onto their legal move
+  // lines, knights bend along their jump, king/pawn/empty squares draw freely.
+  const squarePos = (square: string): [number, number] => [
+    FILES.indexOf(square[0]),
+    8 - Number(square[1]),
+  ]
+  const posKey = (file: number, row: number): string => `${FILES[file]}${8 - row}`
+
+  const snapTarget = (from: string, to: string, role: string | null): string => {
+    if (!role || role === 'knight' || role === 'king' || role === 'pawn') return to
+    const [fx, fy] = squarePos(from)
+    const [tx, ty] = squarePos(to)
+    const dx = tx - fx
+    const dy = ty - fy
+    if (dx === 0 && dy === 0) return to
+    const sx = Math.sign(dx) || 1
+    const sy = Math.sign(dy) || 1
+    const diagonalLen = Math.min(sx > 0 ? 7 - fx : fx, sy > 0 ? 7 - fy : fy)
+    const diagonal = Math.abs(dx) === Math.abs(dy)
+    const straight = dx === 0 || dy === 0
+    if (role === 'bishop') {
+      if (diagonal) return to
+      // Snap onto the nearest diagonal through the origin square.
+      return posKey(fx + diagonalLen * sx, fy + diagonalLen * sy)
+    }
+    if (role === 'rook') {
+      if (straight) return to
+      // Snap onto the dominant rank or file through the origin square.
+      return Math.abs(dx) >= Math.abs(dy) ? posKey(tx, fy) : posKey(fx, ty)
+    }
+    // Queen: exact lines stay; otherwise snap to whichever legal line fits best.
+    if (diagonal || straight) return to
+    const diagness =
+      1 - Math.abs(Math.abs(dx) - Math.abs(dy)) / Math.max(Math.abs(dx), Math.abs(dy))
+    if (diagness >= 0.5) return posKey(fx + diagonalLen * sx, fy + diagonalLen * sy)
+    return Math.abs(dx) >= Math.abs(dy) ? posKey(tx, fy) : posKey(fx, ty)
+  }
+
   const renderShape = (shape: Shape, key: string) => {
     const [fx, fy] = center(shape.from)
     if (shape.kind === 'circle') {
@@ -87,7 +125,7 @@ export function BoardArrows({ getRole, children }: { getRole: (square: string) =
         />
       )
     }
-    const [tx, ty] = center(shape.to)
+    const [tx, ty] = center(snapTarget(shape.from, shape.to, getRole(shape.from)))
     const dx = Math.round(tx - fx)
     const dy = Math.round(ty - fy)
     const isKnightJump =

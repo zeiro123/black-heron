@@ -49,7 +49,6 @@ export default function App() {
   }, [])
 
   const opponentColor = playerIsWhite ? 'b' : 'w'
-  const opponentLabel = `Level ${bot.level} · ${bot.name}`
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -87,11 +86,12 @@ export default function App() {
             <div className="flex w-full max-w-[560px] shrink-0 flex-col gap-2">
               <PlayerBar
                 color={opponentColor}
-                name={opponentLabel}
-                subtitle="Stockfish (WASM) · single-threaded"
+                name={bot.name}
+                subtitle={`Elo ~${bot.rating} · Stockfish (WASM)`}
                 captured={opponentCaptured}
                 materialDiff={opponentDiff}
                 thinking={thinking}
+                avatar={bot.initials}
               />
               <Board />
               <PlayerBar

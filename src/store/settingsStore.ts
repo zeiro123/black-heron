@@ -6,6 +6,7 @@ export type BoardTheme = 'brown' | 'green' | 'blue' | 'slate'
 export interface Settings {
   showDests: boolean
   showCoordinates: boolean
+  coordPlacement: 'inside' | 'outside'
   highlightLastMove: boolean
   animateMoves: boolean
   autoQueen: boolean
@@ -21,6 +22,7 @@ interface SettingsState extends Settings {
 export const DEFAULT_SETTINGS: Settings = {
   showDests: true,
   showCoordinates: true,
+  coordPlacement: 'inside',
   highlightLastMove: true,
   animateMoves: true,
   autoQueen: false,
