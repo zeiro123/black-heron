@@ -14,6 +14,18 @@ export const LABEL_COLORS: Record<MoveLabel, string> = {
   blunder: '#fa412d',
 }
 
+/** Lichess-style symbols: !! brilliant · ! great · ✓ best · ?! inaccuracy · ? mistake · ?? blunder */
+export const LABEL_ICONS: Record<MoveLabel, string> = {
+  brilliant: '!!',
+  great: '!',
+  best: '✓',
+  excellent: '✓',
+  good: '✓',
+  inaccuracy: '?!',
+  mistake: '?',
+  blunder: '??',
+}
+
 export function ReviewPanel() {
   const status = useReviewStore((s) => s.status)
   const progress = useReviewStore((s) => s.progress)
@@ -133,9 +145,11 @@ export function ReviewPanel() {
                       <td className="px-2 py-1 text-right">
                         <span
                           title={label}
-                          className="inline-block h-2.5 w-2.5 rounded-full"
-                          style={{ backgroundColor: LABEL_COLORS[label] }}
-                        />
+                          className="inline-flex h-6 min-w-7 items-center justify-center rounded px-1 text-xs font-bold"
+                          style={{ backgroundColor: `${LABEL_COLORS[label]}2e`, color: LABEL_COLORS[label] }}
+                        >
+                          {LABEL_ICONS[label]}
+                        </span>
                       </td>
                     </tr>
                   )

@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { LABEL_COLORS, LABEL_ICONS } from './ReviewPanel'
 import { useCoachStore } from '../store/coachStore'
 import { useGameStore } from '../store/gameStore'
 import { useSettingsStore } from '../store/settingsStore'
@@ -104,7 +105,16 @@ export function CoachPanel() {
 
           {report.lastMove && (
             <div className="rounded-md border border-zinc-700 bg-zinc-800/40 p-2">
-              <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+              <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                <span
+                  className="inline-flex h-5 min-w-6 items-center justify-center rounded px-1 text-[11px] font-bold normal-case"
+                  style={{
+                    backgroundColor: `${LABEL_COLORS[report.lastMove.label]}2e`,
+                    color: LABEL_COLORS[report.lastMove.label],
+                  }}
+                >
+                  {LABEL_ICONS[report.lastMove.label]}
+                </span>
                 Last move ({report.lastMove.san})
               </p>
               <p className="mt-1 text-xs text-zinc-300">{report.lastMove.phrase}</p>

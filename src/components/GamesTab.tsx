@@ -5,15 +5,23 @@ import { OPENINGS, type Opening } from '../data/openings'
 import { legalDests } from '../game/chessGame'
 import type { Api } from 'chessground/api'
 import type { Dests, Key } from 'chessground/types'
-import { useGuidedStore, type GuidedMode } from '../store/guidedStore'
+import { TIME_CONTROLS, useGuidedStore, type GuidedMode, type TimeControl } from '../store/guidedStore'
 
 export function GamesTab() {
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<Opening | null>(null)
   const [side, setSide] = useState<'w' | 'b'>('w')
   const [mode, setMode] = useState<GuidedMode>('play')
+  const [timeControl, setTimeControl] = useState<TimeControl>(TIME_CONTROLS[2])
   const start = useGuidedStore((s) => s.start)
   const active = useGuidedStore((s) => s.opening)
+  const tick = useGuidedStore((s) => s.tick)
+
+  // The clock ticks in real time while a timed game is running.
+  useEffect(() => {
+    const id = window.setInterval(() => tick(), 100)
+    return () => window.clearInterval(id)
+  }, [tick])
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -26,7 +34,14 @@ export function GamesTab() {
   return (
     <div className="flex flex-col items-start gap-6 lg:flex-row">
       <div className="w-full max-w-[560px] shrink-0">
-        {active ? <GuidedBoard /> : <PlaceholderBoard />}
+        {active ? (
+          <>
+            <Clocks />
+            <GuidedBoard />
+          </>
+        ) : (
+          <PlaceholderBoard />
+        )}
       </div>
       <aside className="w-full space-y-4 lg:w-96">
         <div>
@@ -95,8 +110,25 @@ export function GamesTab() {
           </div>
         </div>
 
+        <div>
+          <p className="mb-1 text-xs uppercase tracking-wide text-zinc-500">Timing</p>
+          <select
+            value={timeControl.label}
+            onChange={(event) =>
+              setTimeControl(TIME_CONTROLS.find((t) => t.label === event.target.value) ?? TIME_CONTROLS[0])
+            }
+            className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition-colors focus:border-amber-400"
+          >
+            {TIME_CONTROLS.map((t) => (
+              <option key={t.label} value={t.label}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <button
-          onClick={() => selected && start(selected, mode, side)}
+          onClick={() => selected && start(selected, mode, side, timeControl)}
           disabled={!selected}
           className="w-full rounded-lg bg-amber-500 px-3 py-2 text-sm font-medium text-zinc-950 transition-colors hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-40"
         >
@@ -152,6 +184,53 @@ function PlaceholderBoard() {
   return (
     <div className="flex aspect-square w-full items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/40 text-sm text-zinc-500">
       Pick an opening and press Start.
+    </div>
+  )
+}
+
+/** mm:ss — switches to seconds.tenths under 20s and seconds.centiseconds under 10s. */
+export function formatClock(ms: number): string {
+  if (ms < 10000) {
+    const s = Math.floor(ms / 1000)
+    const cs = Math.floor((ms % 1000) / 10)
+    return `${s}.${String(cs).padStart(2, '0')}`
+  }
+  if (ms < 20000) {
+    const s = Math.floor(ms / 1000)
+    const tenths = Math.floor((ms % 1000) / 100)
+    return `${s}.${tenths}`
+  }
+  const m = Math.floor(ms / 60000)
+  const s = Math.floor((ms % 60000) / 1000)
+  return `${m}:${String(s).padStart(2, '0')}`
+}
+
+function Clocks() {
+  const remaining = useGuidedStore((s) => s.remaining)
+  const fen = useGuidedStore((s) => s.fen)
+  const playerSide = useGuidedStore((s) => s.playerSide)
+  if (!remaining) return null
+  const active = new Chess(fen).turn()
+  const engineSide: 'w' | 'b' = playerSide === 'w' ? 'b' : 'w'
+  const box = (side: 'w' | 'b', name: string) => {
+    const ms = remaining[side]
+    const low = ms <= 30000
+    const isTurn = active === side
+    return (
+      <div
+        className={`flex-1 rounded-lg border px-3 py-2 text-center text-2xl font-semibold tabular-nums transition-colors ${
+          low ? 'border-red-500/60 bg-red-500/10 text-red-300' : 'border-zinc-700 bg-zinc-900/60 text-zinc-100'
+        } ${isTurn ? 'ring-1 ring-amber-400/60' : ''}`}
+        title={name}
+      >
+        {formatClock(ms)}
+      </div>
+    )
+  }
+  return (
+    <div className="mb-2 flex gap-2">
+      {box(engineSide, 'Computer')}
+      {box(playerSide, 'You')}
     </div>
   )
 }
