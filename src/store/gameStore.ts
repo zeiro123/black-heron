@@ -79,7 +79,8 @@ export const useGameStore = create<GameState>()((set, get) => {
     set({ thinking: true })
     try {
       const level = useSettingsStore.getState().botLevel
-      const uci = await getComputerMove(current.fen, level)
+      const style = useSettingsStore.getState().playStyle
+      const uci = await getComputerMove(current.fen, level, style)
       // A new game may have started while we were "thinking" — drop the stale move.
       if (get().gameId !== gameId || get().status.over) return
       const move = applyMove(chess, uci.slice(0, 2), uci.slice(2, 4), uci[4] as PromotionPiece | undefined)

@@ -6,6 +6,7 @@ import { MoveNav } from './components/MoveNav'
 import { NavRail } from './components/NavRail'
 import { PlayerBar } from './components/PlayerBar'
 import { PromotionDialog } from './components/PromotionDialog'
+import { ReviewPanel } from './components/ReviewPanel'
 import { SettingsPanel } from './components/SettingsPanel'
 import { StatusBar } from './components/StatusBar'
 import { getBotLevel } from './engine/levels'
@@ -108,6 +109,7 @@ export default function App() {
               <Controls />
               <MoveNav />
               <MoveList />
+              <ReviewPanel />
               <p className="text-xs text-zinc-600">
                 {history.length} {history.length === 1 ? 'half-move' : 'half-moves'} played ·
                 right-click drag draws arrows (knight arrows bend) and circles · ← → keys step moves

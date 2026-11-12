@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import type { PlayStyle } from '../engine/opponent'
 
 export type BoardTheme = 'brown' | 'green' | 'blue' | 'slate'
 
@@ -12,6 +13,7 @@ export interface Settings {
   autoQueen: boolean
   boardTheme: BoardTheme
   botLevel: number
+  playStyle: PlayStyle
   playerName: string
 }
 
@@ -28,6 +30,7 @@ export const DEFAULT_SETTINGS: Settings = {
   autoQueen: false,
   boardTheme: 'brown',
   botLevel: 4,
+  playStyle: 'balanced',
   playerName: '',
 }
 

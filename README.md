@@ -46,9 +46,9 @@ supplies the facts; the LLM only phrases them — it never picks the move.
 | 1 Board and rules (human vs computer, promotion, check/mate/draw, undo, resign) | done |
 | 2 Stockfish evaluation (WASM, single-threaded lite build, Web Worker, UCI wrapper) | done |
 | 3 Play vs bot at levels (8 Lichess-style levels) | done |
-| 4 Game review and move ratings (win% -> labels, accuracy, eval graph) | next |
-| 5 Playing styles (MultiPV Tal/Fischer selector, opening books) | |
-| 6 Rule-based coach (hanging pieces, forks, pins, threats, templates) | |
+| 4 Game review and move ratings (win% -> labels, accuracy, eval graph) | done |
+| 5 Playing styles (MultiPV Tal/Fischer/Karpov selector) | done |
+| 6 Rule-based coach (hanging pieces, forks, pins, threats, templates) | next |
 | 7 Puzzles (Lichess puzzle database import) | |
 | 8 Opening trainer (spaced repetition) | |
 | 9 LLM explanations (needs an API key, server-side only) | |
@@ -78,6 +78,16 @@ supplies the facts; the LLM only phrases them — it never picks the move.
   arrows bend along the jump, rook/bishop/queen arrows snap onto their legal move lines
   (rank/file/diagonal), king/pawn/empty squares draw freely; left-click clears.
 - Custom scrollbar on the move list; placeholder nav tabs for future phases.
+- **Game review (Phase 4)**: one button analyses every position with Stockfish, converts
+  evaluations to win% (Lichess model) and labels each move — Brilliant (near-best
+  sacrifice), Great (near-best only-move), Best, Excellent, Good, Inaccuracy, Mistake,
+  Blunder — with **per-player accuracy** and a clickable **evaluation graph**; click any
+  move or point on the graph to jump to that position.
+- **Playing styles (Phase 5)**: a style selector next to the level picker — **Balanced**
+  (level behaviour), **Fischer (principled)** — always the engine's top move, **Tal
+  (attacking)** — accepts up to ~0.6 pawns of eval for checks, captures and sacrifices,
+  **Karpov (solid)** — stays within ~0.15 pawns of best and prefers quiet play. The level
+  still controls strength; the style shapes *which* candidate move is chosen.
 
 ---
 
@@ -91,7 +101,7 @@ supplies the facts; the LLM only phrases them — it never picks the move.
 | Engine | stockfish npm package — WASM single-threaded lite build (stockfish-19-lite-single) in a Web Worker | no server needed, UI never freezes |
 | State | Zustand | game store + persisted settings store |
 | Styling | Tailwind CSS | themes, custom arrows layer, scrollbar |
-| Tests | Vitest | 38+ unit tests on rules, engine ladder, store |
+| Tests | Vitest | 52+ unit tests on rules, engine ladder, review math, styles |
 | Storage | local PostgreSQL (own cluster, port 5433) | saved games, puzzles, review data (later phases) |
 | Lichess API | personal token, **server-side only** (.env -> server/lichess.mjs) | puzzles/explorer data for later phases |
 
