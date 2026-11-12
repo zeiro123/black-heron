@@ -13,7 +13,8 @@
     "db:stop": "node server/pg.mjs stop",
     "db:status": "node server/pg.mjs status",
     "db:migrate": "node server/migrate.mjs",
-    "db:check": "node server/check.mjs"
+    "db:check": "node server/check.mjs",
+    "lichess:check": "node server/lichess.mjs"
   },
   "dependencies": {
     "chess.js": "^1.4.0",
@@ -21,6 +22,7 @@
     "pg": "^8.23.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
+    "stockfish": "^19.0.1",
     "zustand": "^5.1.0"
   },
   "devDependencies": {

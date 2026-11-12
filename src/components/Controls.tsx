@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { BOT_LEVELS } from '../engine/levels'
 import { useGameStore } from '../store/gameStore'
+import { useSettingsStore } from '../store/settingsStore'
 
 export function Controls() {
   const newGame = useGameStore((s) => s.newGame)
@@ -8,13 +10,32 @@ export function Controls() {
   const status = useGameStore((s) => s.status)
   const thinking = useGameStore((s) => s.thinking)
   const history = useGameStore((s) => s.history)
+  const abort = useGameStore((s) => s.abort)
+  const botLevel = useSettingsStore((s) => s.botLevel)
+  const updateSettings = useSettingsStore((s) => s.update)
   const [color, setColor] = useState<'w' | 'b'>('w')
 
   const undoDisabled = thinking || status.reason === 'resigned' || history.length === 0
   const resignDisabled = status.over || thinking
+  // Chess.com-style abort: only available before both players have moved.
+  const abortDisabled = status.over || history.length >= 2
 
   return (
     <div className="space-y-3">
+      <div>
+        <p className="mb-1 text-xs uppercase tracking-wide text-zinc-500">Bot</p>
+        <select
+          value={botLevel}
+          onChange={(event) => updateSettings({ botLevel: Number(event.target.value) })}
+          className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition-colors focus:border-amber-400"
+        >
+          {BOT_LEVELS.map((bot) => (
+            <option key={bot.level} value={bot.level}>
+              Level {bot.level} · {bot.name} (~{bot.rating})
+            </option>
+          ))}
+        </select>
+      </div>
       <div>
         <p className="mb-1 text-xs uppercase tracking-wide text-zinc-500">Play as</p>
         <div className="flex overflow-hidden rounded-lg border border-zinc-700">
@@ -26,29 +47,39 @@ export function Controls() {
                 color === c ? 'bg-zinc-700 text-white' : 'bg-zinc-900 text-zinc-400 hover:text-zinc-200'
               }`}
             >
+              <span className="text-base leading-none">{c === 'w' ? '♔' : '♚'}</span>
               {c === 'w' ? 'White' : 'Black'}
             </button>
           ))}
         </div>
       </div>
-      <div className="flex gap-2">
+      <div className="grid grid-cols-2 gap-2">
         <button
           onClick={() => newGame(color)}
-          className="flex-1 rounded-lg bg-amber-500 px-3 py-2 text-sm font-medium text-zinc-950 transition-colors hover:bg-amber-400"
+          className="col-span-2 rounded-lg bg-amber-500 px-3 py-2 text-sm font-medium text-zinc-950 transition-colors hover:bg-amber-400"
         >
           New game
         </button>
         <button
           onClick={undo}
           disabled={undoDisabled}
-          className="flex-1 rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-200 transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+          title="Take back your move and the computer's reply"
+          className="rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-200 transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Undo
         </button>
         <button
+          onClick={abort}
+          disabled={abortDisabled}
+          title={abortDisabled ? 'Abort is only available before both players have moved' : 'Cancel the game'}
+          className="rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-200 transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Abort
+        </button>
+        <button
           onClick={resign}
           disabled={resignDisabled}
-          className="flex-1 rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-200 transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
+          className="col-span-2 rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-200 transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Resign
         </button>

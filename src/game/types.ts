@@ -12,6 +12,7 @@ export type GameOverReason =
   | 'threefold-repetition'
   | 'fifty-move'
   | 'resigned'
+  | 'aborted'
 
 export interface GameStatus {
   over: boolean

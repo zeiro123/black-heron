@@ -8,6 +8,7 @@ import {
   lastMoveOf,
   legalDests,
   other,
+  positionAtPly,
   statusOf,
 } from './chessGame'
 
@@ -88,6 +89,21 @@ describe('kingSquare', () => {
   it('finds the king of each color', () => {
     expect(kingSquare(new Chess(), 'w')).toBe('e1')
     expect(kingSquare(new Chess(), 'b')).toBe('e8')
+  })
+})
+
+describe('positionAtPly', () => {
+  it('rebuilds positions for back/forward navigation', () => {
+    const moves = ['e4', 'e5', 'Nf3']
+    expect(positionAtPly(moves, 0).lastMove).toBeNull()
+    expect(positionAtPly(moves, 1).lastMove).toEqual(['e2', 'e4'])
+    expect(positionAtPly(moves, 3).lastMove).toEqual(['g1', 'f3'])
+    // Clamps beyond the end.
+    expect(positionAtPly(moves, 99).lastMove).toEqual(['g1', 'f3'])
+    // The live position's FEN matches chess.js's own.
+    const chess = new Chess()
+    for (const san of moves) chess.move(san)
+    expect(positionAtPly(moves, 3).fen).toBe(chess.fen())
   })
 })
 

@@ -22,7 +22,7 @@ export function MoveList() {
       ) : (
         <div
           ref={boxRef}
-          className="max-h-56 overflow-y-auto rounded-lg border border-zinc-800 bg-zinc-900/60"
+          className="moves-scroll max-h-56 overflow-y-auto rounded-lg border border-zinc-800 bg-zinc-900/60"
         >
           <table className="w-full text-sm">
             <tbody>

@@ -81,4 +81,39 @@ describe('gameStore', () => {
     expect(s.history.length).toBe(0)
     expect(s.turn).toBe('w')
   })
+
+  it('abort ends the game before both players have moved', () => {
+    const store = useGameStore
+    store.getState().newGame('w')
+    store.getState().abort()
+    const s = store.getState()
+    expect(s.status.over).toBe(true)
+    expect(s.status.reason).toBe('aborted')
+    expect(s.status.winner).toBeNull()
+    expect(s.thinking).toBe(false)
+  })
+
+  it('abort does nothing once both players have moved', async () => {
+    const store = useGameStore
+    store.getState().newGame('w')
+    store.getState().tryPlayerMove('e2', 'e4')
+    await waitFor(() => !store.getState().thinking)
+    expect(store.getState().history.length).toBe(2)
+    store.getState().abort()
+    expect(store.getState().status.over).toBe(false)
+  })
+
+  it('navigation steps through the game and clamps at the ends', async () => {
+    const store = useGameStore
+    store.getState().newGame('w')
+    store.getState().tryPlayerMove('e2', 'e4')
+    await waitFor(() => !store.getState().thinking)
+    expect(store.getState().history.length).toBe(2)
+    store.getState().navigateTo(1)
+    expect(store.getState().viewPly).toBe(1)
+    store.getState().navigateTo(-5)
+    expect(store.getState().viewPly).toBe(0)
+    store.getState().navigateTo(99)
+    expect(store.getState().viewPly).toBe(2)
+  })
 })

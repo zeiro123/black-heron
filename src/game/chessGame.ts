@@ -79,3 +79,13 @@ export function lastMoveOf(chess: Chess): [Square, Square] | null {
   const last = history[history.length - 1]
   return last ? [last.from, last.to] : null
 }
+
+/** Rebuild the position after `ply` half-moves of `moves` (0 = starting position). */
+export function positionAtPly(
+  moves: string[],
+  ply: number,
+): { fen: string; lastMove: [Square, Square] | null } {
+  const chess = new Chess()
+  for (let i = 0; i < Math.min(ply, moves.length); i++) chess.move(moves[i])
+  return { fen: chess.fen(), lastMove: lastMoveOf(chess) }
+}

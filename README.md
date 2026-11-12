@@ -8,11 +8,12 @@ no two-player mode, and the board never lets one person move both sides.
 - **Build tool:** Vite + React + TypeScript
 - **Rules and PGN:** chess.js
 - **Board:** chessground (the Lichess board: drag & drop, arrows, circles, animations)
-- **Engine:** the stockfish npm package (WASM, single-threaded lite build) in a Web Worker — *Phase 2*
-- **State:** Zustand
-- **Styling:** Tailwind CSS (theme work comes later)
+- **Engine:** the stockfish npm package — WASM, single-threaded lite build (`stockfish-19-lite-single`) in a Web Worker ✅
+- **State:** Zustand (game state + persisted settings)
+- **Styling:** Tailwind CSS (board themes, custom scrollbar, arrows layer)
 - **Tests:** Vitest
 - **Storage:** local PostgreSQL (its own cluster on port 5433)
+- **Lichess API:** personal token, server-side only (`.env` → `server/lichess.mjs`)
 - **Requires:** Node.js 20+ and Git
 
 ## Run it
@@ -34,10 +35,27 @@ npm run dev          # → http://localhost:5173
 
 ## Phases
 
-0 Setup ✅ · **1 Board and rules (human vs computer) ✅** · 2 Stockfish evaluation ·
-3 Play vs bot at levels · 4 Game review and move ratings · 5 Playing styles ·
+0 Setup ✅ · 1 Board and rules (human vs computer) ✅ · 2 Stockfish evaluation ✅ ·
+**3 Play vs bot at levels ✅** · 4 Game review and move ratings · 5 Playing styles ·
 6 Rule-based coach · 7 Puzzles · 8 Opening trainer · 9 LLM explanations (last — no
 AI/LLM/API keys before then) · 10 Polish and deploy
+
+## What the app does today
+
+- Play against **Stockfish** (WASM, in a Web Worker) at **8 Lichess-style difficulty
+  levels**, each with its own bot name and rating — lower levels think shallowly and pick
+  randomly among their best few moves.
+- Player bars with **editable name**, bot name/icon, **captured pieces and material
+  advantage (+N)**, thinking indicator.
+- **Abort** (before both players have moved), **Resign**, **Undo** (your move + the
+  computer's reply), New game as White/Black.
+- **Move navigation** (⏮ ◀ ▶ ⏭ buttons and ←/→/Home/End keys) that steps the board
+  through the game; the board locks while viewing history.
+- **Settings** (gear icon): legal-move dots, coordinates, last-move highlight, move
+  animation, auto-queen, and 4 board themes (persisted to localStorage).
+- **Right-click arrows and circles** drawn in a custom SVG layer — **knight arrows bend
+  along the piece's path**; left-click clears.
+- Custom scrollbar on the move list; placeholder tabs for future phases.
 
 ## Folder structure
 

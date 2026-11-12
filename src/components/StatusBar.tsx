@@ -10,6 +10,7 @@ export function StatusBar() {
   const text = (() => {
     if (status.over) {
       if (status.reason === 'resigned') return 'You resigned — the computer wins.'
+      if (status.reason === 'aborted') return 'Game aborted.'
       if (status.reason === 'checkmate') {
         return status.winner === playerColor
           ? 'Checkmate — you win!'
