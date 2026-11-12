@@ -95,7 +95,7 @@ export function Board() {
   const outerCoords = settings.showCoordinates && settings.coordPlacement === 'outside'
 
   return (
-    <div className={`board-shell board-theme-${settings.boardTheme}`}>
+    <div className={`board-shell board-theme-${settings.boardTheme} ${settings.pieceSet === 'unicode' ? 'pieces-unicode' : ''}`}>
       <div className={outerCoords ? 'board-outer-wrap' : ''}>
         {outerCoords && (
           <div className="outer-ranks" aria-hidden="true">

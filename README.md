@@ -49,9 +49,9 @@ supplies the facts; the LLM only phrases them — it never picks the move.
 | 4 Game review and move ratings (win% -> labels, accuracy, eval graph) | done |
 | 5 Playing styles (MultiPV Tal/Fischer/Karpov selector) | done |
 | 6 Rule-based coach (precise feature detection + templated phrasing) | done |
-| 7 Puzzles (Lichess puzzle database import) | next |
-| 8 Opening trainer (spaced repetition) | |
-| 9 LLM explanations (needs an API key, server-side only) | |
+| 7 Puzzles — live from the Lichess API, streaks, hints, theme/difficulty filters | done |
+| 8 Opening trainer — 60+ ECO lines, drill mode with feedback and progress | done |
+| 9 LLM explanations (needs an API key, server-side only) | next |
 | 10 Polish and deploy (piece sets, sounds, light/dark, PWA) | |
 
 ---
@@ -77,7 +77,26 @@ supplies the facts; the LLM only phrases them — it never picks the move.
 - **Right-click arrows and circles** in a custom SVG layer — **piece-aware**: knight
   arrows bend along the jump, rook/bishop/queen arrows snap onto their legal move lines
   (rank/file/diagonal), king/pawn/empty squares draw freely; left-click clears.
-- Custom scrollbar on the move list; placeholder nav tabs for future phases.
+- Custom scrollbar on the move list; **five tabs**: **Play** (board + controls),
+  **Coach** (board + the live coach), **Puzzles**, **Openings**, **Opponents**.
+- **Puzzles (Phase 7)** — unlimited puzzles fetched live from the Lichess puzzle API
+  (public, CC0 data): pick a difficulty target and a tactical theme (mate, fork, pin,
+  skewer, hanging piece, sacrifice, endgame, trapped piece…), solve on a dedicated board,
+  **streak + best streak + solved counters** (persisted), and live hints (using a hint
+  keeps the streak honest).
+- **Opening trainer (Phase 8)** — a **60+ entry ECO library** (Nimzo-Larsen to King's
+  Indian, mainstream theory) with search and spaced-repetition-lite prioritisation:
+  drill a line, the app plays the other side, wrong moves get feedback, and progress
+  (drilled/correct/wrong/streak) is tracked per opening.
+- **Opponents tab (Phase 5)** — **100+ opponents**: real players with accurate ratings
+  (Carlsen 2882, Kasparov 2851, Caruana 2842, Hikaru, Polgár, Capablanca, Tal, Morphy…)
+  plus fictional club personas across every rating band, each with a playing trait
+  (attacking / solid / principled / creative / universal) that drives the move-selection
+  rule, and UCI Skill Level + depth derived from the rating.
+- **Piece sets** — choose Classic (cburnett SVG), Text (Unicode glyphs) or Contrast
+  (high-contrast filter) in the settings.
+- **Elaborate settings** — board themes, coordinates with Inside/Outside placement, piece
+  sets, legal-move dots, animation, live coach, auto-queen — all persisted.
 - **Game review (Phase 4)**: one button analyses every position with Stockfish, converts
   evaluations to win% (Lichess model) and labels each move — Brilliant (near-best
   sacrifice), Great (near-best only-move), Best, Excellent, Good, Inaccuracy, Mistake,

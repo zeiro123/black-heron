@@ -1,6 +1,7 @@
 import { Chess } from 'chess.js'
 import { create } from 'zustand'
 import { cancelComputerMove, engineNewGame, getComputerMove } from '../engine/opponent'
+import { findStyle, ratingToDepth, ratingToSkill } from '../data/styles'
 import {
   START_FEN,
   applyMove,
@@ -78,9 +79,12 @@ export const useGameStore = create<GameState>()((set, get) => {
     const gameId = current.gameId
     set({ thinking: true })
     try {
-      const level = useSettingsStore.getState().botLevel
-      const style = useSettingsStore.getState().playStyle
-      const uci = await getComputerMove(current.fen, level, style)
+      const style = findStyle(useSettingsStore.getState().botId)
+      const uci = await getComputerMove(current.fen, {
+        skill: ratingToSkill(style.rating),
+        depth: ratingToDepth(style.rating),
+        pick: style.pick,
+      })
       // A new game may have started while we were "thinking" — drop the stale move.
       if (get().gameId !== gameId || get().status.over) return
       const move = applyMove(chess, uci.slice(0, 2), uci.slice(2, 4), uci[4] as PromotionPiece | undefined)

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { PlayStyle } from '../engine/opponent'
+import { STYLES } from '../data/styles'
 
 export type BoardTheme = 'brown' | 'green' | 'blue' | 'slate'
 
@@ -13,8 +13,9 @@ export interface Settings {
   autoQueen: boolean
   liveCoach: boolean
   boardTheme: BoardTheme
-  botLevel: number
-  playStyle: PlayStyle
+  pieceSet: 'classic' | 'unicode'
+  /** The selected opponent from the style library. */
+  botId: string
   playerName: string
 }
 
@@ -31,8 +32,8 @@ export const DEFAULT_SETTINGS: Settings = {
   autoQueen: false,
   liveCoach: true,
   boardTheme: 'brown',
-  botLevel: 4,
-  playStyle: 'balanced',
+  pieceSet: 'classic',
+  botId: STYLES.find((style) => style.name === 'Levy Rozman')?.id ?? STYLES[0].id,
   playerName: '',
 }
 

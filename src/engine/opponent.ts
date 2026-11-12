@@ -1,5 +1,4 @@
 import { Chess } from 'chess.js'
-import { BOT_LEVELS, chooseMove, getBotLevel } from './levels'
 import { UciEngine, type EngineInfo } from './uciEngine'
 
 // Phase 5: playing styles. The engine reports several candidate lines (MultiPV) and the
@@ -8,14 +7,7 @@ import { UciEngine, type EngineInfo } from './uciEngine'
 
 export const ENGINE_WORKER_URL = '/engine/stockfish-19-lite-single.js'
 
-export type PlayStyle = 'balanced' | 'fischer' | 'tal' | 'karpov'
-
-export const STYLE_LABELS: { id: PlayStyle; label: string }[] = [
-  { id: 'balanced', label: 'Balanced' },
-  { id: 'fischer', label: 'Fischer (principled)' },
-  { id: 'tal', label: 'Tal (attacking)' },
-  { id: 'karpov', label: 'Karpov (solid)' },
-]
+export type PlayStyle = 'aggressive' | 'principled' | 'solid' | 'balanced'
 
 export interface Candidate {
   uci: string
@@ -114,9 +106,7 @@ export function styledPick(candidates: Candidate[], style: PlayStyle): string | 
   const within = (candidate: Candidate, maxLossCp: number): boolean =>
     best.cp === null || candidate.cp === null || best.cp - candidate.cp <= maxLossCp
 
-  if (style === 'fischer') return best.uci
-
-  if (style === 'tal') {
+  if (style === 'aggressive') {
     // Accept up to ~0.6 pawns of eval for checks, captures and sacrifices.
     const pool = candidates.filter((c) => within(c, 60)).slice(0, 4)
     const scored = pool
@@ -128,7 +118,7 @@ export function styledPick(candidates: Candidate[], style: PlayStyle): string | 
     return scored[0]?.c.uci ?? best.uci
   }
 
-  if (style === 'karpov') {
+  if (style === 'solid') {
     // Stay within ~0.15 pawns of the best move and prefer quiet, principled play.
     const pool = candidates.filter((c) => within(c, 15)).slice(0, 4)
     const scored = pool
@@ -140,27 +130,44 @@ export function styledPick(candidates: Candidate[], style: PlayStyle): string | 
     return scored[0]?.c.uci ?? best.uci
   }
 
-  // Balanced — the level ladder's own random pick among its candidates.
-  return candidates[Math.floor(Math.random() * candidates.length)].uci
+  // Balanced — a random pick among the top three lines.
+  const pool = candidates.slice(0, 3)
+  return pool[Math.floor(Math.random() * pool.length)]?.uci ?? best.uci
 }
 
-export async function getComputerMove(fen: string, level = 4, style: PlayStyle = 'balanced'): Promise<string> {
+export interface BotParams {
+  /** UCI Skill Level 0–20 — what actually weakens the bot's move choice. */
+  skill: number
+  /** Search depth cap. */
+  depth: number
+  /** Move-selection rule. */
+  pick: PlayStyle
+}
+
+export async function getComputerMove(fen: string, params: BotParams): Promise<string> {
   const started = Date.now()
-  const bot = getBotLevel(level)
   let uci: string | null = null
   try {
     const uciEngine = await ensureEngine()
-    // Styled play needs several candidate lines to choose from.
-    const multiPV = style === 'balanced' ? bot.multiPV : Math.max(bot.multiPV, 4)
     const { infos, bestmove } = await uciEngine.go({
       fen,
-      depth: bot.depth,
-      multiPV,
+      depth: params.depth,
+      multiPV: 4,
+      skill: params.skill,
     })
-    if (style === 'balanced') {
-      uci = chooseMove(infos, bot.pickFrom) ?? bestmove
-    } else {
-      uci = styledPick(buildCandidates(fen, infos), style) ?? bestmove
+    const candidates = buildCandidates(fen, infos)
+    switch (params.pick) {
+      case 'principled':
+        uci = candidates[0]?.uci ?? bestmove
+        break
+      case 'aggressive':
+        uci = styledPick(candidates, 'aggressive') ?? bestmove
+        break
+      case 'solid':
+        uci = styledPick(candidates, 'solid') ?? bestmove
+        break
+      default:
+        uci = styledPick(candidates, 'balanced') ?? bestmove
     }
   } catch (error) {
     console.error('Stockfish unavailable — falling back to a random legal move.', error)
@@ -181,5 +188,3 @@ export function cancelComputerMove(): void {
 export function engineNewGame(): void {
   engine?.newGame()
 }
-
-export const botLevelCount = BOT_LEVELS.length

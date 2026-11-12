@@ -66,18 +66,18 @@ describe('styledPick (Phase 5 playing styles)', () => {
     { uci: 'e4d5', cp: 10, isCapture: true, isCheck: false, isSacrifice: false },
   ]
 
-  it('Fischer always plays the top move', () => {
-    expect(styledPick(candidates, 'fischer')).toBe('g1f3')
+  it('principled always plays the top move', () => {
+    expect(styledPick(candidates, 'principled')).toBe('g1f3')
   })
 
-  it('Tal prefers the checking move within the eval threshold', () => {
+  it('aggressive prefers the checking move within the eval threshold', () => {
     // Qh5: 20cp + 20 (check) = 40 > 30 (Nf3 quiet) → the attack wins.
-    expect(styledPick(candidates, 'tal')).toBe('d1h5')
+    expect(styledPick(candidates, 'aggressive')).toBe('d1h5')
   })
 
-  it('Karpov prefers the quiet move over the capture within the threshold', () => {
+  it('solid prefers the quiet move over the capture within the threshold', () => {
     // Nf3: 30cp quiet vs Qh5: 20 − 10 (check) = 10 → the quiet move wins.
-    expect(styledPick(candidates, 'karpov')).toBe('g1f3')
+    expect(styledPick(candidates, 'solid')).toBe('g1f3')
   })
 
   it('falls back to the best move when nothing fits the style pool', () => {
@@ -85,8 +85,8 @@ describe('styledPick (Phase 5 playing styles)', () => {
       { uci: 'a1a2', cp: 100 },
       { uci: 'b1b2', cp: -80 },
     ]
-    expect(styledPick(far, 'karpov')).toBe('a1a2')
-    expect(styledPick([], 'tal')).toBeNull()
+    expect(styledPick(far, 'solid')).toBe('a1a2')
+    expect(styledPick([], 'aggressive')).toBeNull()
   })
 })
 

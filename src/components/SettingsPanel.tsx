@@ -12,23 +12,28 @@ function Toggle({
   label,
   checked,
   onChange,
+  hint,
 }: {
   label: string
   checked: boolean
   onChange: (value: boolean) => void
+  hint?: string
 }) {
   return (
     <button
       onClick={() => onChange(!checked)}
-      className="flex w-full items-center justify-between rounded-lg px-2 py-2 text-sm text-zinc-200 transition-colors hover:bg-zinc-800/60"
+      className="w-full rounded-lg px-2 py-2 text-left transition-colors hover:bg-zinc-800/60"
     >
-      <span>{label}</span>
-      <span className={`relative h-5 w-9 rounded-full transition-colors ${checked ? 'bg-amber-500' : 'bg-zinc-700'}`}>
-        <span
-          className="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all"
-          style={{ left: checked ? 18 : 2 }}
-        />
+      <span className="flex items-center justify-between">
+        <span className="text-sm text-zinc-200">{label}</span>
+        <span className={`relative h-5 w-9 rounded-full transition-colors ${checked ? 'bg-amber-500' : 'bg-zinc-700'}`}>
+          <span
+            className="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all"
+            style={{ left: checked ? 18 : 2 }}
+          />
+        </span>
       </span>
+      {hint && <span className="mt-0.5 block text-xs text-zinc-500">{hint}</span>}
     </button>
   )
 }
@@ -87,9 +92,36 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
             )
           })}
         </div>
+
+        <SectionTitle>Pieces</SectionTitle>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            { id: 'classic' as const, label: 'Classic', hint: 'SVG pieces (Lichess cburnett)' },
+            { id: 'unicode' as const, label: 'Unicode', hint: 'Symbol glyphs, scales with the board' },
+          ].map((set) => {
+            const selected = settings.pieceSet === set.id
+            return (
+              <button
+                key={set.id}
+                onClick={() => settings.update({ pieceSet: set.id })}
+                className={`rounded-lg border-2 p-2 text-left transition-colors ${
+                  selected ? 'border-amber-400 bg-amber-500/5' : 'border-zinc-700 hover:border-zinc-500'
+                }`}
+              >
+                <span className="flex items-center gap-1.5 text-sm text-zinc-100">
+                  {set.label}
+                  {selected && <span className="text-xs text-amber-300">✓</span>}
+                </span>
+                <span className="mt-0.5 block text-xs text-zinc-500">{set.hint}</span>
+              </button>
+            )
+          })}
+        </div>
+
         <div className="mt-2 space-y-1">
           <Toggle
             label="Show board coordinates"
+            hint="Rank numbers and file letters around the board"
             checked={settings.showCoordinates}
             onChange={(v) => settings.update({ showCoordinates: v })}
           />
@@ -124,21 +156,25 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
         <div className="space-y-1">
           <Toggle
             label="Show legal moves"
+            hint="Dots on every square your piece can move to"
             checked={settings.showDests}
             onChange={(v) => settings.update({ showDests: v })}
           />
           <Toggle
             label="Animate moves"
+            hint="Pieces slide between squares"
             checked={settings.animateMoves}
             onChange={(v) => settings.update({ animateMoves: v })}
           />
           <Toggle
             label="Live coach"
+            hint="Analyses your position after every move"
             checked={settings.liveCoach}
             onChange={(v) => settings.update({ liveCoach: v })}
           />
           <Toggle
             label="Always promote to a queen"
+            hint="Skips the promotion dialog"
             checked={settings.autoQueen}
             onChange={(v) => settings.update({ autoQueen: v })}
           />

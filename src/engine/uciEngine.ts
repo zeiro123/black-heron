@@ -65,7 +65,15 @@ export class UciEngine {
   }
 
   async go(
-    options: { fen: string; moves?: string[]; depth?: number; movetime?: number; multiPV?: number },
+    options: {
+      fen: string
+      moves?: string[]
+      depth?: number
+      movetime?: number
+      multiPV?: number
+      /** UCI Skill Level 0–20 — sent per search so weak bots choose weaker moves. */
+      skill?: number
+    },
     timeoutMs = 60000,
   ): Promise<GoResult> {
     // Serialise searches: game review and the bot share this engine, and UCI
@@ -83,6 +91,9 @@ export class UciEngine {
       }
       this.subs.add(sub)
       try {
+        if (options.skill !== undefined) {
+          this.send(`setoption name Skill Level value ${Math.max(0, Math.min(20, Math.round(options.skill)))}`)
+        }
         this.send(`setoption name MultiPV value ${options.multiPV ?? 1}`)
         const moves = options.moves?.length ? ` moves ${options.moves.join(' ')}` : ''
         this.send(`position fen ${options.fen}${moves}`)

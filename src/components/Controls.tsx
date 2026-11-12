@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { BOT_LEVELS } from '../engine/levels'
-import { STYLE_LABELS, type PlayStyle } from '../engine/opponent'
+import { STYLES, ratingBand } from '../data/styles'
 import { useGameStore } from '../store/gameStore'
 import { useSettingsStore } from '../store/settingsStore'
 
@@ -12,8 +11,7 @@ export function Controls() {
   const thinking = useGameStore((s) => s.thinking)
   const history = useGameStore((s) => s.history)
   const abort = useGameStore((s) => s.abort)
-  const botLevel = useSettingsStore((s) => s.botLevel)
-  const playStyle = useSettingsStore((s) => s.playStyle)
+  const botId = useSettingsStore((s) => s.botId)
   const updateSettings = useSettingsStore((s) => s.update)
   const [color, setColor] = useState<'w' | 'b'>('w')
 
@@ -25,31 +23,29 @@ export function Controls() {
   return (
     <div className="space-y-3">
       <div>
-        <p className="mb-1 text-xs uppercase tracking-wide text-zinc-500">Bot</p>
+        <p className="mb-1 text-xs uppercase tracking-wide text-zinc-500">
+          Opponent · {STYLES.length} styles
+        </p>
         <select
-          value={botLevel}
-          onChange={(event) => updateSettings({ botLevel: Number(event.target.value) })}
+          value={botId}
+          onChange={(event) => updateSettings({ botId: event.target.value })}
           className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition-colors focus:border-amber-400"
         >
-          {BOT_LEVELS.map((bot) => (
-            <option key={bot.level} value={bot.level}>
-              Level {bot.level} · {bot.name} (~{bot.rating})
-            </option>
-          ))}
-        </select>
-      </div>
-      <div>
-        <p className="mb-1 text-xs uppercase tracking-wide text-zinc-500">Playing style</p>
-        <select
-          value={playStyle}
-          onChange={(event) => updateSettings({ playStyle: event.target.value as PlayStyle })}
-          className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 outline-none transition-colors focus:border-amber-400"
-        >
-          {STYLE_LABELS.map((style) => (
-            <option key={style.id} value={style.id}>
-              {style.label}
-            </option>
-          ))}
+          {['Super-GM', 'Grandmaster', 'Master', 'Expert', 'Strong club', 'Club', 'Beginner'].map(
+            (band) => {
+              const group = STYLES.filter((style) => ratingBand(style.rating) === band)
+              if (group.length === 0) return null
+              return (
+                <optgroup key={band} label={band}>
+                  {group.map((style) => (
+                    <option key={style.id} value={style.id}>
+                      {style.name} (~{style.rating}) — {style.pick}
+                    </option>
+                  ))}
+                </optgroup>
+              )
+            },
+          )}
         </select>
       </div>
       <div>
