@@ -1,7 +1,7 @@
 import { Chess } from 'chess.js'
 import { create } from 'zustand'
 import { findStyle, ratingToDepth, ratingToSkill } from '../data/styles'
-import { getComputerMove } from '../engine/opponent'
+import { getComputerMove, getEngine } from '../engine/opponent'
 import type { Opening } from '../data/openings'
 import { useSettingsStore } from './settingsStore'
 
@@ -45,6 +45,8 @@ interface GuidedState {
   feedback: string | null
   /** True while the played game still matches the opening's book line. */
   onLine: boolean
+  /** White-perspective evaluation of the current guided position (for the eval bar). */
+  cpWhite: number | null
   /** Remaining clock per side in ms — null when untimed. */
   remaining: { w: number; b: number } | null
 
@@ -56,6 +58,7 @@ interface GuidedState {
   ) => void
   tryMove: (from: string, to: string, promotion?: string) => Promise<void>
   engineMove: () => Promise<void>
+  updateEval: (fen: string) => Promise<void>
   tick: () => void
   requestHint: () => void
   resign: () => void
@@ -76,6 +79,7 @@ export const useGuidedStore = create<GuidedState>()((set, get) => ({
   suggestion: null,
   feedback: null,
   onLine: true,
+  cpWhite: null,
   remaining: null,
 
   start: (opening, mode, playerSide, timeControl) => {
@@ -108,6 +112,21 @@ export const useGuidedStore = create<GuidedState>()((set, get) => ({
         timeControl.ms > 0 ? { w: timeControl.ms, b: timeControl.ms } : null,
     })
     void get().engineMove()
+  },
+
+  updateEval: async (fen: string) => {
+    try {
+      const engine = await getEngine()
+      const { infos } = await engine.go({ fen, depth: 8, multiPV: 1 })
+      const best = infos.find((x) => x.multipv === 1) ?? infos[0]
+      if (!best) return
+      const turn = new Chess(fen).turn()
+      const cpStm =
+        best.scoreCp ?? (best.scoreMate !== null ? (best.scoreMate > 0 ? 10000 : -10000) : 0)
+      set({ cpWhite: turn === 'w' ? cpStm : -cpStm })
+    } catch {
+      // The eval bar simply stays where it is.
+    }
   },
 
   tick: () => {
@@ -163,6 +182,7 @@ export const useGuidedStore = create<GuidedState>()((set, get) => ({
       onLine,
       suggestion: null,
     })
+    void get().updateEval(chess.fen())
 
     if (chess.isGameOver()) {
       finish(set, chess, state.playerSide)
@@ -230,6 +250,7 @@ export const useGuidedStore = create<GuidedState>()((set, get) => ({
               : null,
             thinking: false,
           })
+          void get().updateEval(fresh.fen())
           if (fresh.isGameOver()) finish(set, fresh, state.playerSide)
           return
         }
@@ -268,6 +289,7 @@ export const useGuidedStore = create<GuidedState>()((set, get) => ({
           : null,
         thinking: false,
       })
+      void get().updateEval(fresh.fen())
       if (fresh.isGameOver()) finish(set, fresh, state.playerSide)
     } catch (error) {
       console.error('Guided engine move failed:', error)
@@ -351,4 +373,9 @@ function finish(
     phrase = 'Game over.'
   }
   set({ over: true, resultPhrase: phrase })
+}
+
+// Debug hook (dev only)
+if (typeof window !== 'undefined') {
+  ;(window as unknown as { __guided?: typeof useGuidedStore }).__guided = useGuidedStore
 }

@@ -6,6 +6,8 @@ import { legalDests } from '../game/chessGame'
 import type { Api } from 'chessground/api'
 import type { Dests, Key } from 'chessground/types'
 import { TIME_CONTROLS, useGuidedStore, type GuidedMode, type TimeControl } from '../store/guidedStore'
+import { EvalBar } from './EvalBar'
+import { useSettingsStore } from '../store/settingsStore'
 
 export function GamesTab() {
   const [query, setQuery] = useState('')
@@ -16,6 +18,9 @@ export function GamesTab() {
   const start = useGuidedStore((s) => s.start)
   const active = useGuidedStore((s) => s.opening)
   const tick = useGuidedStore((s) => s.tick)
+  const evalBarOn = useSettingsStore((s) => s.evalBar)
+  const guidedCp = useGuidedStore((s) => s.cpWhite)
+  const guidedSide = useGuidedStore((s) => s.playerSide)
 
   // The clock ticks in real time while a timed game is running.
   useEffect(() => {
@@ -37,7 +42,14 @@ export function GamesTab() {
         {active ? (
           <>
             <Clocks />
-            <GuidedBoard />
+            <div className="flex gap-2">
+              {evalBarOn && guidedCp !== null && (
+                <EvalBar cpWhite={guidedCp} orientation={guidedSide} />
+              )}
+              <div className="min-w-0 flex-1">
+                <GuidedBoard />
+              </div>
+            </div>
           </>
         ) : (
           <PlaceholderBoard />

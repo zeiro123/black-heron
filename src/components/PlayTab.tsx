@@ -1,5 +1,6 @@
 import { Board } from './Board'
 import { Controls } from './Controls'
+import { EvalBar } from './EvalBar'
 import { MoveList } from './MoveList'
 import { MoveNav } from './MoveNav'
 import { PlayerBar } from './PlayerBar'
@@ -8,6 +9,7 @@ import { StatusBar } from './StatusBar'
 import { findStyle, initialsOf } from '../data/styles'
 import { capturedFromFen } from '../game/captured'
 import { positionAtPly } from '../game/chessGame'
+import { useCoachStore } from '../store/coachStore'
 import { useGameStore } from '../store/gameStore'
 import { useSettingsStore } from '../store/settingsStore'
 
@@ -19,6 +21,8 @@ export function PlayTab() {
   const playerName = useSettingsStore((s) => s.playerName)
   const updateSettings = useSettingsStore((s) => s.update)
   const botId = useSettingsStore((s) => s.botId)
+  const evalBarOn = useSettingsStore((s) => s.evalBar)
+  const coachCp = useCoachStore((s) => s.report?.cpWhite ?? null)
 
   const bot = findStyle(botId)
   const display = positionAtPly(history, viewPly)
@@ -43,7 +47,12 @@ export function PlayTab() {
           thinking={thinking}
           avatar={initialsOf(bot.name)}
         />
-        <Board />
+        <div className="flex gap-2">
+          {evalBarOn && coachCp !== null && <EvalBar cpWhite={coachCp} orientation={playerColor} />}
+          <div className="min-w-0 flex-1">
+            <Board />
+          </div>
+        </div>
         <PlayerBar
           color={playerColor}
           name={playerName}

@@ -173,6 +173,12 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
             onChange={(v) => settings.update({ liveCoach: v })}
           />
           <Toggle
+            label="Eval bar"
+            hint="Vertical bar next to the board, sized by who is winning"
+            checked={settings.evalBar}
+            onChange={(v) => settings.update({ evalBar: v })}
+          />
+          <Toggle
             label="Always promote to a queen"
             hint="Skips the promotion dialog"
             checked={settings.autoQueen}

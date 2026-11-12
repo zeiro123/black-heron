@@ -13,6 +13,7 @@ export interface Settings {
   animateMoves: boolean
   autoQueen: boolean
   liveCoach: boolean
+  evalBar: boolean
   playSounds: boolean
   uiTheme: UiTheme
   boardTheme: BoardTheme
@@ -34,6 +35,7 @@ export const DEFAULT_SETTINGS: Settings = {
   animateMoves: true,
   autoQueen: false,
   liveCoach: true,
+  evalBar: true,
   playSounds: true,
   uiTheme: 'dark',
   boardTheme: 'brown',
