@@ -48,8 +48,8 @@ supplies the facts; the LLM only phrases them — it never picks the move.
 | 3 Play vs bot at levels (8 Lichess-style levels) | done |
 | 4 Game review and move ratings (win% -> labels, accuracy, eval graph) | done |
 | 5 Playing styles (MultiPV Tal/Fischer/Karpov selector) | done |
-| 6 Rule-based coach (hanging pieces, forks, pins, threats, templates) | next |
-| 7 Puzzles (Lichess puzzle database import) | |
+| 6 Rule-based coach (precise feature detection + templated phrasing) | done |
+| 7 Puzzles (Lichess puzzle database import) | next |
 | 8 Opening trainer (spaced repetition) | |
 | 9 LLM explanations (needs an API key, server-side only) | |
 | 10 Polish and deploy (piece sets, sounds, light/dark, PWA) | |
@@ -88,6 +88,15 @@ supplies the facts; the LLM only phrases them — it never picks the move.
   (attacking)** — accepts up to ~0.6 pawns of eval for checks, captures and sacrifices,
   **Karpov (solid)** — stays within ~0.15 pawns of best and prefers quiet play. The level
   still controls strength; the style shapes *which* candidate move is chosen.
+- **Rule-based coach (Phase 6)** — live, precise, no AI. A self-contained attack scanner
+  computes every piece's attacks from the board (pinned pieces included), powering exact
+  detections: **hanging pieces** (undefended, or attacked by a cheaper piece), **absolute
+  pins** to your king, **forks** that actually win material, **mate threats** from the
+  engine, and **king-zone pressure**. The coach phrases the best move ("Try Nf3 — Develop
+  the knight", "Win the queen on d4 — it was undefended"), tells the story of the last
+  move (quality from the win% model + new threats + the stronger alternative), warns when
+  *your* move dropped winning chances, and draws the engine's expected line as **blue
+  arrows** on the board. Every rule is unit-tested with crafted positions.
 
 ---
 
@@ -101,7 +110,7 @@ supplies the facts; the LLM only phrases them — it never picks the move.
 | Engine | stockfish npm package — WASM single-threaded lite build (stockfish-19-lite-single) in a Web Worker | no server needed, UI never freezes |
 | State | Zustand | game store + persisted settings store |
 | Styling | Tailwind CSS | themes, custom arrows layer, scrollbar |
-| Tests | Vitest | 52+ unit tests on rules, engine ladder, review math, styles |
+| Tests | Vitest | 66+ unit tests on rules, engine ladder, review math, styles, coach detections |
 | Storage | local PostgreSQL (own cluster, port 5433) | saved games, puzzles, review data (later phases) |
 | Lichess API | personal token, **server-side only** (.env -> server/lichess.mjs) | puzzles/explorer data for later phases |
 

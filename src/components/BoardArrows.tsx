@@ -1,10 +1,11 @@
 import { useCallback, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 
-interface Shape {
+export interface Shape {
   kind: 'arrow' | 'circle'
   from: string
   to: string
+  color?: string
 }
 
 const ARROW_COLOR = '#15781b'
@@ -14,8 +15,17 @@ const FILES = 'abcdefgh'
  * Right-click arrows and circles, drawn in our own SVG layer so that
  * knight-move arrows can BEND along the piece's path (chess.com style).
  * Left click clears the drawings, like the Lichess board.
+ * `coachShapes` are the engine's expected line — drawn in blue underneath.
  */
-export function BoardArrows({ getRole, children }: { getRole: (square: string) => string | null; children: ReactNode }) {
+export function BoardArrows({
+  getRole,
+  coachShapes,
+  children,
+}: {
+  getRole: (square: string) => string | null
+  coachShapes?: Shape[]
+  children: ReactNode
+}) {
   const anchorRef = useRef<HTMLDivElement | null>(null)
   const dragFrom = useRef<string | null>(null)
   const [shapes, setShapes] = useState<Shape[]>([])
@@ -71,6 +81,15 @@ export function BoardArrows({ getRole, children }: { getRole: (square: string) =
     8 - Number(square[1]) + 0.5,
   ]
 
+  /** Is the jump from→to a knight's (1,2) jump? */
+  const knightShape = (from: string, to: string): boolean => {
+    const [fx, fy] = squarePos(from)
+    const [tx, ty] = squarePos(to)
+    const dx = Math.abs(tx - fx)
+    const dy = Math.abs(ty - fy)
+    return (dx === 1 && dy === 2) || (dx === 2 && dy === 1)
+  }
+
   // Piece-aware arrows: sliders (rook/bishop/queen) snap onto their legal move
   // lines, knights bend along their jump, king/pawn/empty squares draw freely.
   const squarePos = (square: string): [number, number] => [
@@ -110,6 +129,7 @@ export function BoardArrows({ getRole, children }: { getRole: (square: string) =
   }
 
   const renderShape = (shape: Shape, key: string) => {
+    const color = shape.color ?? ARROW_COLOR
     const [fx, fy] = center(shape.from)
     if (shape.kind === 'circle') {
       return (
@@ -119,19 +139,24 @@ export function BoardArrows({ getRole, children }: { getRole: (square: string) =
           cy={fy}
           r={0.46}
           fill="none"
-          stroke={ARROW_COLOR}
+          stroke={color}
           strokeWidth={0.08}
           opacity={0.8}
         />
       )
     }
-    const [tx, ty] = center(snapTarget(shape.from, shape.to, getRole(shape.from)))
+    // Coach arrows follow the engine's line: knight-shaped jumps always bend (the
+    // PV is a legal line, so a (1,2) jump there is a knight). User arrows check the piece.
+    const isCoach = shape.color !== undefined
+    const role = isCoach ? null : getRole(shape.from)
+    const bends = isCoach
+      ? knightShape(shape.from, shape.to)
+      : role === 'knight' && knightShape(shape.from, shape.to)
+    const [tx, ty] = center(snapTarget(shape.from, shape.to, role))
     const dx = Math.round(tx - fx)
     const dy = Math.round(ty - fy)
-    const isKnightJump =
-      getRole(shape.from) === 'knight' &&
-      ((Math.abs(dx) === 1 && Math.abs(dy) === 2) || (Math.abs(dx) === 2 && Math.abs(dy) === 1))
-    if (!isKnightJump) {
+    const markerId = isCoach ? 'heron-arrowhead-blue' : 'heron-arrowhead-green'
+    if (!bends) {
       return (
         <line
           key={key}
@@ -139,10 +164,10 @@ export function BoardArrows({ getRole, children }: { getRole: (square: string) =
           y1={fy}
           x2={tx}
           y2={ty}
-          stroke={ARROW_COLOR}
+          stroke={color}
           strokeWidth={0.18}
           strokeLinecap="round"
-          markerEnd="url(#heron-arrowhead)"
+          markerEnd={`url(#${markerId})`}
           opacity={0.85}
         />
       )
@@ -154,17 +179,18 @@ export function BoardArrows({ getRole, children }: { getRole: (square: string) =
         key={key}
         d={`M ${fx} ${fy} L ${corner[0]} ${corner[1]} L ${tx} ${ty}`}
         fill="none"
-        stroke={ARROW_COLOR}
+        stroke={color}
         strokeWidth={0.18}
         strokeLinecap="round"
         strokeLinejoin="round"
-        markerEnd="url(#heron-arrowhead)"
+        markerEnd={`url(#${markerId})`}
         opacity={0.85}
       />
     )
   }
 
-  const all = preview ? [...shapes, preview] : shapes
+  const coach = (coachShapes ?? []).map((s) => ({ ...s, color: '#003088' }))
+  const all = [...coach, ...(preview ? [...shapes, preview] : shapes)]
 
   return (
     <div
@@ -182,8 +208,11 @@ export function BoardArrows({ getRole, children }: { getRole: (square: string) =
       {children}
       <svg className="cg-arrows" viewBox="0 0 8 8" aria-hidden="true">
         <defs>
-          <marker id="heron-arrowhead" markerWidth="2.2" markerHeight="2.2" refX="1.4" refY="1.1" orient="auto">
-            <path d="M0,0 L2.2,1.1 L0,2.2 z" fill={ARROW_COLOR} />
+          <marker id="heron-arrowhead-green" markerWidth="2.2" markerHeight="2.2" refX="1.4" refY="1.1" orient="auto">
+            <path d="M0,0 L2.2,1.1 L0,2.2 z" fill="#15781b" />
+          </marker>
+          <marker id="heron-arrowhead-blue" markerWidth="2.2" markerHeight="2.2" refX="1.4" refY="1.1" orient="auto">
+            <path d="M0,0 L2.2,1.1 L0,2.2 z" fill="#003088" />
           </marker>
         </defs>
         {all.map((shape, index) => renderShape(shape, `${shape.kind}-${shape.from}-${shape.to}-${index}`))}

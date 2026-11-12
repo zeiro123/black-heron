@@ -11,6 +11,7 @@ export interface Settings {
   highlightLastMove: boolean
   animateMoves: boolean
   autoQueen: boolean
+  liveCoach: boolean
   boardTheme: BoardTheme
   botLevel: number
   playStyle: PlayStyle
@@ -28,6 +29,7 @@ export const DEFAULT_SETTINGS: Settings = {
   highlightLastMove: true,
   animateMoves: true,
   autoQueen: false,
+  liveCoach: true,
   boardTheme: 'brown',
   botLevel: 4,
   playStyle: 'balanced',

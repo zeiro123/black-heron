@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Board } from './components/Board'
+import { CoachPanel } from './components/CoachPanel'
 import { Controls } from './components/Controls'
 import { MoveList } from './components/MoveList'
 import { MoveNav } from './components/MoveNav'
@@ -109,6 +110,7 @@ export default function App() {
               <Controls />
               <MoveNav />
               <MoveList />
+              <CoachPanel />
               <ReviewPanel />
               <p className="text-xs text-zinc-600">
                 {history.length} {history.length === 1 ? 'half-move' : 'half-moves'} played ·

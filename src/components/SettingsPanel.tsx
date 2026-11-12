@@ -133,6 +133,11 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
             onChange={(v) => settings.update({ animateMoves: v })}
           />
           <Toggle
+            label="Live coach"
+            checked={settings.liveCoach}
+            onChange={(v) => settings.update({ liveCoach: v })}
+          />
+          <Toggle
             label="Always promote to a queen"
             checked={settings.autoQueen}
             onChange={(v) => settings.update({ autoQueen: v })}

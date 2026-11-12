@@ -5,11 +5,14 @@ import type { Dests, Key } from 'chessground/types'
 import { useEffect, useMemo, useRef } from 'react'
 import { positionAtPly } from '../game/chessGame'
 import type { Color } from '../game/types'
+import { useCoachStore } from '../store/coachStore'
 import { useGameStore } from '../store/gameStore'
 import { useSettingsStore } from '../store/settingsStore'
 import { BoardArrows } from './BoardArrows'
 
 const cgColor = (color: Color): 'white' | 'black' => (color === 'w' ? 'white' : 'black')
+
+const EMPTY_MOVES: string[] = []
 
 export function Board() {
   const elRef = useRef<HTMLDivElement | null>(null)
@@ -25,6 +28,9 @@ export function Board() {
   const thinking = useGameStore((s) => s.thinking)
   const pendingPromotion = useGameStore((s) => s.pendingPromotion)
   const tryPlayerMove = useGameStore((s) => s.tryPlayerMove)
+  const coachContinuation = useCoachStore((s) =>
+    s.showLine ? (s.report?.continuation ?? EMPTY_MOVES) : EMPTY_MOVES,
+  )
 
   // The board shows the position the viewer stepped to (back/forward navigation).
   const display = useMemo(() => positionAtPly(history, viewPly), [history, viewPly])
@@ -79,6 +85,13 @@ export function Board() {
   const getRole = (square: string): string | null =>
     apiRef.current?.state.pieces.get(square as Key)?.role ?? null
 
+  // The coach's expected line, drawn in blue — only meaningful at the live position.
+  const coachShapes = atLive
+    ? coachContinuation
+        .slice(0, 3)
+        .map((uci) => ({ kind: 'arrow' as const, from: uci.slice(0, 2), to: uci.slice(2, 4) }))
+    : []
+
   const outerCoords = settings.showCoordinates && settings.coordPlacement === 'outside'
 
   return (
@@ -91,7 +104,7 @@ export function Board() {
             ))}
           </div>
         )}
-        <BoardArrows getRole={getRole}>
+        <BoardArrows getRole={getRole} coachShapes={coachShapes}>
           <div ref={elRef} className="board" aria-label="Chess board" />
         </BoardArrows>
         {outerCoords && <div className="outer-corner" aria-hidden="true" />}

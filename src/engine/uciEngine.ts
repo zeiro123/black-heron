@@ -124,8 +124,11 @@ export class UciEngine {
 
 export function parseInfo(line: string): EngineInfo | null {
   const depth = / depth (\d+)/.exec(line)?.[1]
-  const pv = / pv ([a-h][1-8][a-h][1-8][qrbn]?)/.exec(line)?.[1]
-  if (!depth || !pv) return null
+  const pvText = / pv (.+)$/.exec(line)?.[1]
+  if (!depth || !pvText) return null
+  // Keep every UCI-looking token: the full PV powers the coach's "expected line".
+  const pv = pvText.split(/\s+/).filter((token) => /^[a-h][1-8][a-h][1-8]/.test(token))
+  if (pv.length === 0) return null
   const cp = / score cp (-?\d+)/.exec(line)?.[1]
   const mate = / score mate (-?\d+)/.exec(line)?.[1]
   const multipv = / multipv (\d+)/.exec(line)?.[1]
@@ -134,6 +137,6 @@ export function parseInfo(line: string): EngineInfo | null {
     multipv: multipv ? Number(multipv) : 1,
     scoreCp: cp !== undefined ? Number(cp) : null,
     scoreMate: mate !== undefined ? Number(mate) : null,
-    pv: [pv],
+    pv,
   }
 }
