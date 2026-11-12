@@ -1,0 +1,14 @@
+# Dependencies & build output
+node_modules/
+dist/
+
+# Never commit real configuration
+.env
+
+# Local PostgreSQL data directory and logs
+.pgdata/
+*.log
+
+# OS / editor noise
+.DS_Store
+Thumbs.db

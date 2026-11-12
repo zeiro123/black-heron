@@ -1,0 +1,36 @@
+{
+  "name": "chess-coach",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:start": "node server/pg.mjs start",
+    "db:stop": "node server/pg.mjs stop",
+    "db:status": "node server/pg.mjs status",
+    "db:migrate": "node server/migrate.mjs",
+    "db:check": "node server/check.mjs"
+  },
+  "dependencies": {
+    "chess.js": "^1.4.0",
+    "chessground": "^9.2.1",
+    "pg": "^8.23.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zustand": "^5.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "latest",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.9.0",
+    "vite": "latest",
+    "vitest": "^3.2.0"
+  }
+}
