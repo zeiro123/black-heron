@@ -103,6 +103,7 @@ export function buildCandidates(fen: string, infos: EngineInfo[]): Candidate[] {
 export function styledPick(candidates: Candidate[], style: PlayStyle): string | null {
   if (candidates.length === 0) return null
   const best = candidates[0]
+  if (style === 'principled') return best.uci
   const within = (candidate: Candidate, maxLossCp: number): boolean =>
     best.cp === null || candidate.cp === null || best.cp - candidate.cp <= maxLossCp
 
