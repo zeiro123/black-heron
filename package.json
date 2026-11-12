@@ -34,5 +34,6 @@
     "typescript": "^5.9.0",
     "vite": "latest",
     "vitest": "^3.2.0"
-  }
+  },
+  "description": "Playing Styles — The AI Chess Trainer: play a chess engine, solve puzzles, master openings and train with a built-in person-style playing picker."
 }

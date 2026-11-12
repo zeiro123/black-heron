@@ -1,4 +1,4 @@
-# Black Heron — Chess Coach
+# Playing Styles — The AI Chess Trainer
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 [![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white)](https://react.dev)
