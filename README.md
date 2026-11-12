@@ -52,7 +52,7 @@ supplies the facts; the LLM only phrases them — it never picks the move.
 | 7 Puzzles — live from the Lichess API, streaks, hints, theme/difficulty filters | done |
 | 8 Opening trainer — 60+ ECO lines, drill mode with feedback and progress | done |
 | 9 LLM explanations (needs an API key, server-side only) | next |
-| 10 Polish and deploy (piece sets, sounds, light/dark, PWA) | |
+| 10 Polish — light/dark, sounds, PWA, error boundary, deploy-ready build | done |
 
 ---
 
@@ -77,8 +77,14 @@ supplies the facts; the LLM only phrases them — it never picks the move.
 - **Right-click arrows and circles** in a custom SVG layer — **piece-aware**: knight
   arrows bend along the jump, rook/bishop/queen arrows snap onto their legal move lines
   (rank/file/diagonal), king/pawn/empty squares draw freely; left-click clears.
-- Custom scrollbar on the move list; **five tabs**: **Play** (board + controls),
-  **Coach** (board + the live coach), **Puzzles**, **Openings**, **Opponents**.
+- Custom scrollbar on the move list; **six tabs**: **Play** (board + controls),
+  **Coach** (board + the live coach), **Games** (play an opening against the computer),
+  **Puzzles**, **Openings**, **Opponents**.
+- **Opening games** — pick any opening in the Games tab and choose a mode: **Play**
+  (the computer follows that opening's book, then plays freely at your selected
+  opponent's strength) or **Walkthrough** (the coach guides you along the main line:
+  correct moves get confirmation, wrong moves name the book move, and hints suggest the
+  next move — then carry on freely when the book runs out).
 - **Puzzles (Phase 7)** — unlimited puzzles fetched live from the Lichess puzzle API
   (public, CC0 data): pick a difficulty target and a tactical theme (mate, fork, pin,
   skewer, hanging piece, sacrifice, endgame, trapped piece…), solve on a dedicated board,
@@ -93,10 +99,14 @@ supplies the facts; the LLM only phrases them — it never picks the move.
   plus fictional club personas across every rating band, each with a playing trait
   (attacking / solid / principled / creative / universal) that drives the move-selection
   rule, and UCI Skill Level + depth derived from the rating.
-- **Piece sets** — choose Classic (cburnett SVG), Text (Unicode glyphs) or Contrast
-  (high-contrast filter) in the settings.
+- **Piece sets** — choose Classic (cburnett SVG) or Text (Unicode glyphs) in the settings.
 - **Elaborate settings** — board themes, coordinates with Inside/Outside placement, piece
   sets, legal-move dots, animation, live coach, auto-queen — all persisted.
+- **Phase 10 polish** — **light/dark mode** (Interface section), **move/capture/check
+  sounds** (synthesised with WebAudio — no audio assets), **installable PWA** (manifest +
+  service worker with offline app shell; Lichess puzzles always fetched live), and a
+  React **error boundary** so one broken component never blanks the app. Deploy: `npm run
+  build` → host `dist/` on Vercel or Netlify.
 - **Game review (Phase 4)**: one button analyses every position with Stockfish, converts
   evaluations to win% (Lichess model) and labels each move — Brilliant (near-best
   sacrifice), Great (near-best only-move), Best, Excellent, Good, Inaccuracy, Mistake,

@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware'
 import { STYLES } from '../data/styles'
 
 export type BoardTheme = 'brown' | 'green' | 'blue' | 'slate'
+export type UiTheme = 'dark' | 'light'
 
 export interface Settings {
   showDests: boolean
@@ -12,6 +13,8 @@ export interface Settings {
   animateMoves: boolean
   autoQueen: boolean
   liveCoach: boolean
+  playSounds: boolean
+  uiTheme: UiTheme
   boardTheme: BoardTheme
   pieceSet: 'classic' | 'unicode'
   /** The selected opponent from the style library. */
@@ -31,6 +34,8 @@ export const DEFAULT_SETTINGS: Settings = {
   animateMoves: true,
   autoQueen: false,
   liveCoach: true,
+  playSounds: true,
+  uiTheme: 'dark',
   boardTheme: 'brown',
   pieceSet: 'classic',
   botId: STYLES.find((style) => style.name === 'Levy Rozman')?.id ?? STYLES[0].id,

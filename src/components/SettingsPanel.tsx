@@ -178,11 +178,37 @@ export function SettingsPanel({ open, onClose }: { open: boolean; onClose: () =>
             checked={settings.autoQueen}
             onChange={(v) => settings.update({ autoQueen: v })}
           />
+          <Toggle
+            label="Play sounds"
+            hint="Move, capture and check sounds"
+            checked={settings.playSounds}
+            onChange={(v) => settings.update({ playSounds: v })}
+          />
+        </div>
+
+        <SectionTitle>Interface</SectionTitle>
+        <div className="flex items-center justify-between px-2 py-1.5">
+          <span className="text-xs text-zinc-400">Light or dark</span>
+          <div className="flex overflow-hidden rounded-lg border border-zinc-700 text-xs">
+            {(['dark', 'light'] as const).map((theme) => (
+              <button
+                key={theme}
+                onClick={() => settings.update({ uiTheme: theme })}
+                className={`px-3 py-1 capitalize transition-colors ${
+                  settings.uiTheme === theme
+                    ? 'bg-zinc-700 text-white'
+                    : 'bg-zinc-900 text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                {theme}
+              </button>
+            ))}
+          </div>
         </div>
 
         <SectionTitle>Coming in later phases</SectionTitle>
         <p className="px-2 pb-1 text-xs text-zinc-600">
-          Piece sets, sounds, light/dark mode, background — Phase 10 polish.
+          More piece sets, background art, accounts — Phase 10 polish.
         </p>
       </div>
     </div>

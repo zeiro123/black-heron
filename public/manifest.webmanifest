@@ -1,0 +1,17 @@
+{
+  "name": "Black Heron — Chess Coach",
+  "short_name": "Black Heron",
+  "description": "A chess teaching web app — play Stockfish at 8 difficulty levels, puzzles, openings and a rule-based coach.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

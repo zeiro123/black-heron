@@ -65,7 +65,53 @@
 .pieces-unicode .board piece.queen.black::after { content: '\265B'; }
 .pieces-unicode .board piece.king.black::after { content: '\265A'; }
 
-/* Coordinates placed OUTSIDE the board (settings → placement: outside). */
+/* ===== Light mode (settings → uiTheme: light) — targeted overrides of the dark surfaces. */
+.ui-light {
+  background-color: #f4f4f5;
+  color: #18181b;
+}
+.ui-light .bg-zinc-950 {
+  background-color: #fafafa;
+}
+.ui-light .bg-zinc-900,
+.ui-light .bg-zinc-900\/60 {
+  background-color: #ffffff;
+}
+.ui-light .bg-zinc-800\/60,
+.ui-light .bg-zinc-800\/40 {
+  background-color: #f4f4f5;
+}
+.ui-light .bg-zinc-800 {
+  background-color: #e4e4e7;
+}
+.ui-light .text-zinc-100,
+.ui-light .text-zinc-200,
+.ui-light .text-zinc-300 {
+  color: #27272a;
+}
+.ui-light .text-zinc-400,
+.ui-light .text-zinc-500 {
+  color: #71717a;
+}
+.ui-light .text-zinc-600 {
+  color: #a1a1aa;
+}
+.ui-light .border-zinc-800,
+.ui-light .border-zinc-800\/60,
+.ui-light .border-zinc-800\/80 {
+  border-color: #e4e4e7;
+}
+.ui-light .border-zinc-700 {
+  border-color: #d4d4d8;
+}
+.ui-light .border-zinc-600 {
+  border-color: #c9ccd1;
+}
+.ui-light .border-zinc-500 {
+  border-color: #b0b3b8;
+}
+
+/* ===== Coordinates placed OUTSIDE the board (settings → placement: outside). */
 .board-outer-wrap {
   display: grid;
   grid-template-columns: 18px 1fr;
