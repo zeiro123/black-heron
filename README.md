@@ -1,5 +1,11 @@
 # Black Heron — Chess Coach
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Engine](https://img.shields.io/badge/Engine-Stockfish%2019%20WASM-b58863)](https://stockfishchess.org)
+[![Tests](https://img.shields.io/badge/tests-Vitest%2038%20passing-6e9f18?logo=vitest&logoColor=white)](https://vitest.dev)
+
 A chess teaching web app built from scratch in phases. **Human vs computer only** — there is
 no two-player mode, and the board never lets one person move both sides.
 
